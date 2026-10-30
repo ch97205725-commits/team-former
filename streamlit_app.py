@@ -72,9 +72,12 @@ if _missing:
 try:
     pool = get_pool()
 except Exception as e:  # noqa: BLE001
-    # DB 주소(비밀번호 포함)가 화면에 나오지 않도록 오류 종류만 보여 줌
+    # DB 주소의 비밀번호와 사용자 이름은 가리고, 원인을 짐작할 수 있는 안내만 보여 줌
     st.error(f"DB에 연결하지 못함({type(e).__name__}). DATABASE_URL 값과 Supabase 프로젝트가 "
              "일시정지되지 않았는지 확인하세요.")
+    st.markdown("**진단** (비밀번호는 가림)")
+    for line in db.diagnose(secret("DATABASE_URL"), e):
+        st.markdown(f"- {line}")
     st.stop()
 
 
