@@ -1,0 +1,21 @@
+# 외부 예약 서비스(깃허브 액션)로 매일 DB에 질의를 보내 Supabase 일시정지를 막음
+name: DB keep-alive
+
+on:
+  schedule:
+    - cron: "17 0 * * *"   # 매일 00:17 UTC = 한국 시각 09:17
+  workflow_dispatch:        # Actions 탭에서 직접 실행해 볼 수 있음
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install psycopg2-binary
+      - run: python scripts/keepalive.py
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}

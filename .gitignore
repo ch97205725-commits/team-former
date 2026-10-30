@@ -1,0 +1,15 @@
+# 비밀 값 — 절대 올리지 않음
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# 파이썬
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 기타
+.DS_Store
+*.zip
