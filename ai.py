@@ -14,10 +14,12 @@ import rules
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 TOTAL_TIMEOUT = 120  # 초. 모델 하나에 주는 전체 대기 시간
 
+# 10/31 관리자 화면의 '지금 무료인 모델 목록'에서 회사가 서로 다른 일반용 모델 3개를 고름
+# (처음 넣었던 nemotron-3-super, gpt-oss-120b, glm-4.5-air 는 무료 버전이 없어져 HTTP 404 를 냈음)
 DEFAULT_MODELS = [
-    "nvidia/nemotron-3-super-120b-a12b:free",
-    "openai/gpt-oss-120b:free",
-    "z-ai/glm-4.5-air:free",
+    "google/gemma-4-31b-it:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "thinkingmachines/inkling:free",
 ]
 
 _executor = ThreadPoolExecutor(max_workers=12)

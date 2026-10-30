@@ -25,10 +25,9 @@ https://team-former-3mbxvqp7rqwhshvlgtfreg.streamlit.app/
 | DB 일시정지 막기 | 어려운 해결 | 깃허브 액션(`.github/workflows/db-keepalive.yml`)이 매일 09:17(한국 시각) DB에 질의 |
 
 ## 4. 쓴 모델 3개
-✏️ 실제로 Secrets 에 넣은 모델로 고칠 것
-- 1차 `nvidia/nemotron-3-super-120b-a12b:free`
-- 2차 `openai/gpt-oss-120b:free`
-- 3차 `z-ai/glm-4.5-air:free`
+- 1차 `google/gemma-4-31b-it:free`
+- 2차 `nvidia/nemotron-3-ultra-550b-a55b:free`
+- 3차 `thinkingmachines/inkling:free`
 
 ## 5. 오픈라우터 AI 모델 호출 실패 사례
 ✏️ 직접 시험하다 실제로 생긴 실패를 적고 화면을 `img/`에 넣을 것(꾸며 내면 시나리오 밖 점수 0점).
