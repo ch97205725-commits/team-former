@@ -14,12 +14,14 @@ import rules
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 TOTAL_TIMEOUT = 120  # 초. 모델 하나에 주는 전체 대기 시간
 
-# 10/31 관리자 화면의 '지금 무료인 모델 목록'에서 회사가 서로 다른 일반용 모델 3개를 고름
-# (처음 넣었던 nemotron-3-super, gpt-oss-120b, glm-4.5-air 는 무료 버전이 없어져 HTTP 404 를 냈음)
+# 10/31 관리자 화면의 '지금 무료인 모델 목록'에서 일반용 모델을 고름
+# - 처음 넣었던 nemotron-3-super, gpt-oss-120b, glm-4.5-air 는 무료 버전이 없어져 HTTP 404
+# - thinkingmachines/inkling:free 는 에이전트 앱 전용이라 HTTP 403 → 뺌
+# - nemotron-3-ultra 가 실제로 28초 만에 배정에 성공해서 1차로 둠
 DEFAULT_MODELS = [
-    "google/gemma-4-31b-it:free",
     "nvidia/nemotron-3-ultra-550b-a55b:free",
-    "thinkingmachines/inkling:free",
+    "google/gemma-4-31b-it:free",
+    "dots-studio/dots-3-note-preview:free",
 ]
 
 _executor = ThreadPoolExecutor(max_workers=12)
