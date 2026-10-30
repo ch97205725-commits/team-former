@@ -353,6 +353,19 @@ def admin_page():
     with res_box:
         show_result(st.session_state.get("msg"))
 
+    with st.expander("쓰는 모델과 지금 무료인 모델 목록"):
+        for i, m in enumerate(ai.get_models(secret), start=1):
+            st.markdown(f"- {i}차: `{m}`")
+        if st.button("오픈라우터에서 지금 무료인 모델 불러오기", key="list_free_models"):
+            try:
+                free = ai.list_free_models()
+                st.caption(f"무료 텍스트 모델 {len(free)}개(문맥 길이가 긴 순). "
+                           "이름을 그대로 복사해 Secrets 의 OPENROUTER_MODEL_1~3 에 넣으세요.")
+                st.code("\n".join(f"{mid}    ({ctx:,} tokens)" for mid, ctx in free) or "(없음)",
+                        language=None)
+            except Exception as e:  # noqa: BLE001
+                st.error(f"목록을 불러오지 못함({type(e).__name__})")
+
     with st.expander("AI 호출 기록(최근 12건)"):
         logs = run(service.recent_ai_logs)
         if not logs:

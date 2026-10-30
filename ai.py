@@ -130,6 +130,21 @@ def parse_assignments(text: str) -> dict:
     return out
 
 
+def list_free_models(timeout=15) -> list:
+    """오픈라우터에서 지금 무료로 쓸 수 있는 텍스트 생성 모델 목록(키 필요 없음).
+    돌려주는 값: [(모델 이름, 문맥 길이)] — 문맥 길이가 긴 순."""
+    resp = requests.get("https://openrouter.ai/api/v1/models", timeout=timeout)
+    resp.raise_for_status()
+    out = []
+    for m in resp.json().get("data", []):
+        mid = m.get("id", "")
+        arch = m.get("architecture") or {}
+        outputs = arch.get("output_modalities") or ["text"]
+        if mid.endswith(":free") and mid != "openrouter/free" and "text" in outputs:
+            out.append((mid, int(m.get("context_length") or 0)))
+    return sorted(out, key=lambda x: -x[1])
+
+
 def get_models(secret_getter) -> list:
     models = []
     for i, default in enumerate(DEFAULT_MODELS, start=1):

@@ -5,7 +5,7 @@
 > ✏️ 표시가 있는 곳은 직접 확인하고 채워야 하는 칸임. 제출 전에 ✏️ 표시를 모두 지울 것.
 
 ## 1. 배포 주소
-✏️ https://(배포한 주소).streamlit.app
+https://team-former-3mbxvqp7rqwhshvlgtfreg.streamlit.app/
 
 ## 2. PRD와 구현 계획의 위치
 - PRD: `docs/PRD.md`
