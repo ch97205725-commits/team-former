@@ -42,6 +42,13 @@ https://team-former-3mbxvqp7rqwhshvlgtfreg.streamlit.app/
   처음 고른 모델 3개가 모두 "This model is unavailable for free"로 실패 → 앱이 스스로 배정해 확정한 팀 구성도 규칙을 지킴.
   화면 `img/ai-log-404.png`, 확정 뒤 팀 `img/middle-step11-teams.png`
 
+- **사례 4: 형식 오류와 빈 응답** (10/31 15:21~15:22, 어려움 시나리오 마감 뒤)
+  1차 `nvidia/nemotron-3-ultra-550b-a55b:free`는 96.1초 만에 답했지만 JSON 앞에 다른 글이 붙어 있어 읽지 못함
+  ("Expecting property name enclosed in double quotes") → 2차 HTTP 429 → 3차 `dots-studio/dots-3-note-preview:free`는
+  61초 뒤 본문이 빈 응답 → 앱이 스스로 배정해 확정함(네 팀 모두 규칙을 지킴).
+  화면 `img/ai-log-format-empty.png`, 확정 뒤 팀 `img/hard-final-teams.png`.
+  이후 답 속의 JSON을 앞에서부터 모두 찾아 `assignments`가 든 마지막 것을 쓰고, 본문이 비면 생각(reasoning) 안의 답을 쓰도록 고침.
+
 ## 6. 클로드가 잘못된 추론이나 답변을 한 사례
 - **사례 1: 쓸 수 없는 무료 모델을 기본값으로 넣음**
   클로드는 무료 모델로 `nvidia/nemotron-3-super-120b-a12b:free`, `openai/gpt-oss-120b:free`, `z-ai/glm-4.5-air:free`를
@@ -65,6 +72,11 @@ https://team-former-3mbxvqp7rqwhshvlgtfreg.streamlit.app/
 - **무료 모델은 같은 날에도 결과가 들쭉날쭉함**
   같은 1차 모델이 02:03과 02:06에 모두 429였고, 같은 2차 모델이 02:03에는 28초 만에 성공했지만 02:06에는 120초 시간 초과였음.
   하루 호출 한도(50회)도 있어 시험을 많이 하면 채점 때 쓸 횟수가 모자랄 수 있음.
+- **어려움 시나리오 9단계: 모두 찬성했는데 거절됨(의도한 동작)**
+  학생5가 먼저 팀2에 승인된 뒤 학생6(같은 웹 프로그래머)에게 팀원 3명이 모두 찬성했지만,
+  승인 직전 검사에서 "같은 주 역할의 팀원이 있음"으로 거절됨(`img/hard-step9-recheck.png`).
+  규칙에는 맞지만, 투표하는 학생은 찬성 단추를 누르기 전에 이렇게 될 줄 모름 →
+  같은 팀에 대기 지원이 여럿이면 "먼저 승인되는 지원에 따라 거절될 수 있음"을 투표 영역에 미리 보여 주면 좋겠음.
 
 ## 부록: 실행 방법
 ```bash

@@ -273,7 +273,7 @@ def do_assign(ph):
                 except (ValueError, TypeError, AttributeError) as e:
                     err, outcome = f"답을 읽을 수 없음: {e}", "형식 오류"
             else:
-                outcome = "시간 초과" if "시간 초과" in (err or "") else ("빈 응답" if err == "빈 응답" else "오류")
+                outcome = "시간 초과" if "시간 초과" in (err or "") else ("빈 응답" if (err or "").startswith("빈 응답") else "오류")
             run(service.log_ai, i, model, outcome, err or f"{len(proposal or {})}명 배정", el)
             if proposal is not None:
                 break

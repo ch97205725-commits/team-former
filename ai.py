@@ -59,7 +59,7 @@ def _post(model: str, prompt: str, api_key: str, cancel: threading.Event):
     body = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": 6000,
+        "max_tokens": 8000,
         "temperature": 0.2,
         "reasoning": {"effort": "low"},
     }
@@ -79,11 +79,18 @@ def _post(model: str, prompt: str, api_key: str, cancel: threading.Event):
     if "error" in data:
         return None, f"오류: {data['error'].get('message', data['error'])}"
     try:
-        content = data["choices"][0]["message"].get("content") or ""
-    except (KeyError, IndexError):
+        choice = data["choices"][0]
+        msg = choice["message"]
+    except (KeyError, IndexError, TypeError):
         return None, "응답 형식이 이상함(choices 없음)"
+    content = msg.get("content") or ""
     if not content.strip():
-        return None, "빈 응답"
+        # 생각(reasoning)만 하고 본문을 비운 모델이 있음 → 생각 안에 JSON 답이 있으면 그것을 씀
+        reasoning = msg.get("reasoning") or ""
+        if '"assignments"' in reasoning:
+            return reasoning, None
+        why = choice.get("finish_reason") or choice.get("native_finish_reason") or "?"
+        return None, f"빈 응답(finish_reason={why})"
     return content, None
 
 
@@ -111,18 +118,31 @@ def call_model(model: str, prompt: str, api_key: str, on_tick=None):
         time.sleep(1)
 
 
+def _find_json_objects(text: str):
+    """글 속에 들어 있는 JSON 객체를 앞에서부터 모두 꺼냄(앞뒤에 설명이 섞여 있어도 됨)."""
+    dec = json.JSONDecoder()
+    i = text.find("{")
+    while i >= 0:
+        try:
+            obj, end = dec.raw_decode(text, i)
+            yield obj
+            i = text.find("{", end)
+        except json.JSONDecodeError:
+            i = text.find("{", i + 1)
+
+
 def parse_assignments(text: str) -> dict:
-    """AI 답에서 {학번: [팀번호,...]} 를 꺼냄. 형식이 틀리면 ValueError."""
+    """AI 답에서 {학번: [팀번호,...]} 를 꺼냄. 형식이 틀리면 ValueError.
+    모델이 JSON 앞에 생각이나 설명을 붙이는 경우가 있어, assignments 가 들어 있는 객체 가운데 마지막 것을 씀."""
     t = re.sub(r"```(?:json)?", "", text)
-    i, j = t.find("{"), t.rfind("}")
-    if i < 0 or j < i:
-        raise ValueError("JSON을 찾지 못함")
-    obj = json.loads(t[i:j + 1])
-    items = obj.get("assignments") if isinstance(obj, dict) else None
-    if not isinstance(items, list):
-        raise ValueError("assignments 목록이 없음")
+    found = [o for o in _find_json_objects(t)
+             if isinstance(o, dict) and isinstance(o.get("assignments"), list)]
+    if not found:
+        raise ValueError("assignments 목록이 든 JSON을 찾지 못함")
     out = {}
-    for it in items:
+    for it in found[-1]["assignments"]:
+        if not isinstance(it, dict):
+            raise ValueError(f"항목 형식이 틀림: {it}")
         no = str(it.get("student_no", "")).strip()
         team = it.get("team")
         if isinstance(team, str):

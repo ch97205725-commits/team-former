@@ -103,7 +103,7 @@ content, err, el = ai.call_model("m", "p", "k")
 ok("응답이 천천히 와도 전체 4초에서 끊음", content is None and "시간 초과" in err and el < 6, f"({err}, {el:.1f}초)")
 Slow.mode = "empty"
 content, err, el = ai.call_model("m", "p", "k")
-ok("빈 응답은 실패", content is None and err == "빈 응답", err)
+ok("빈 응답은 실패", content is None and err.startswith("빈 응답"), err)
 Slow.mode = "429"
 content, err, el = ai.call_model("m", "p", "k")
 ok("HTTP 429는 실패", content is None and "429" in err, err)
